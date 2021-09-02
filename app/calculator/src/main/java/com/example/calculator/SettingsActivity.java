@@ -15,10 +15,12 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             String theme = bundle.getString(MainActivity.THEME);
-            if (theme == MainActivity.LIGHT) {
-                setTheme(R.style.Theme_Calculator);
-            } else if (theme == MainActivity.NIGHT) {
-                setTheme(R.style.Theme_CalculatorNight);
+            if (theme != null) {
+                if (theme.equals(MainActivity.LIGHT)) {
+                    setTheme(R.style.Theme_Calculator);
+                } else if (theme.equals(MainActivity.NIGHT)) {
+                    setTheme(R.style.Theme_CalculatorNight);
+                }
             }
         }
         setContentView(R.layout.activity_settings);
@@ -26,20 +28,21 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View view) {
+        String theme;
         switch (view.getId()) {
             case (R.id.light_theme):
-                Intent intent1 = new Intent();
-                intent1.putExtra(MainActivity.THEME, MainActivity.LIGHT);
-                setResult(RESULT_OK, intent1);
-                finish();
+                theme = MainActivity.LIGHT;
                 break;
             case (R.id.night_theme):
-                Intent intent2 = new Intent();
-                intent2.putExtra(MainActivity.THEME, MainActivity.NIGHT);
-                setResult(RESULT_OK, intent2);
-                finish();
+                theme = MainActivity.NIGHT;
                 break;
+            default:
+                return;
         }
+        Intent intent = new Intent();
+        intent.putExtra(MainActivity.THEME, theme);
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
 }

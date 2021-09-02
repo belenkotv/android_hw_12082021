@@ -28,40 +28,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         launcher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        if (result.getResultCode() == Activity.RESULT_OK) {
-                            // There are no request codes
-                            Intent data = result.getData();
-                            if (data == null) {
-                                return;
-                            }
-                            Bundle bundle = data.getExtras();
-                            if (bundle == null) {
-                                return;
-                            }
-                            String theme = bundle.getString(THEME);
-                            if ((theme != LIGHT) && (theme != NIGHT)) {
-                                return;
-                            }
-                            Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                            intent.putExtra(THEME, theme);
-                            MainActivity.this.startActivity(intent);
-                            finish();
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        if (data == null) {
+                            return;
                         }
+                        Bundle bundle = data.getExtras();
+                        if (bundle == null) {
+                            return;
+                        }
+                        String theme = bundle.getString(THEME);
+                        if (theme == null) {
+                            return;
+                        }
+                        if (!theme.equals(LIGHT) && !theme.equals(NIGHT)) {
+                            return;
+                        }
+                        Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                        intent.putExtra(THEME, theme);
+                        MainActivity.this.startActivity(intent);
+                        finish();
                     }
-                });
+                }
+            });
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             theme = bundle.getString(THEME);
-            if (theme == LIGHT) {
-                setTheme(R.style.Theme_Calculator);
-            } else if (theme == NIGHT) {
-                setTheme(R.style.Theme_CalculatorNight);
+            if (theme != null) {
+                if (theme.equals(LIGHT)) {
+                    setTheme(R.style.Theme_Calculator);
+                } else if (theme.equals(NIGHT)) {
+                    setTheme(R.style.Theme_CalculatorNight);
+                }
             }
         }
         setContentView(R.layout.activity_main);
@@ -145,7 +149,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (item.getItemId()) {
             case R.id.settings:
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-                intent.putExtra(THEME, theme);
+                if (theme != null) {
+                    intent.putExtra(THEME, theme);
+                }
                 launcher.launch(intent);
                 return true;
             default:
