@@ -85,21 +85,23 @@ public class Calculator {
     }
 
     public String inputOperation(char op) throws IllegalArgumentException {
-        switch (op) {
-            case '+':
-            case '-':
-            case '*':
-            case '/':
-                break;
-            default:
-                throw new IllegalArgumentException("Неверная операция");
-        }
-        if (operation.length() == 0) {
-            if (numberA.length() == 0) {
-                numberA.append('0');
+        if (numberA.length() > 0) {
+            switch (op) {
+                case '+':
+                case '-':
+                case '*':
+                case '/':
+                    break;
+                default:
+                    throw new IllegalArgumentException("Неверная операция");
             }
-            operation.append(op);
-            inputB = true;
+            if (operation.length() == 0) {
+                if (numberA.length() == 0) {
+                    numberA.append('0');
+                }
+                operation.append(op);
+                inputB = true;
+            }
         }
         return showScreen();
     }
@@ -153,12 +155,15 @@ public class Calculator {
     }
 
     Double convertNumber(StringBuilder number, int decimalPoint, boolean negative) {
-        Double x = Double.parseDouble(number.toString());
+        Double x = 0.0;
+        if (number.length() > 0) {
+            x = Double.parseDouble(number.toString());
+        }
         if (decimalPoint > 0) {
             x /= Math.pow(10, decimalPointA);
         }
-        if (negativeA) {
-            return x;
+        if (negative) {
+            return -x;
         } else {
             return x;
         }
