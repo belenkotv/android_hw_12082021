@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">homework1</string>
     <string name="is_equal">Равно?</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
 
