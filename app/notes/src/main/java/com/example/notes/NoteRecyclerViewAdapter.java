@@ -2,7 +2,9 @@ package com.example.notes;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,9 +58,14 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
 
         @Override
         public void onClick(View view) {
-            Intent intent = new Intent(view.getContext(), NoteActivity.class);
-            intent.putExtra(NoteActivity.INDEX, this.getAbsoluteAdapterPosition());
-            view.getContext().startActivity(intent);
+            int orientation = view.getContext().getResources().getConfiguration().orientation;
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                MainActivity.mainActivity.showNoteFragment(this.getAbsoluteAdapterPosition());
+            } else {
+                Intent intent = new Intent(view.getContext(), NoteActivity.class);
+                intent.putExtra(NoteActivity.INDEX, this.getAbsoluteAdapterPosition());
+                view.getContext().startActivity(intent);
+            }
          }
     }
 }

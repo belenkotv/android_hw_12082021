@@ -9,7 +9,21 @@
     <fragment
         android:id="@+id/notes"
         android:name="com.example.notes.NoteShortFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+    <FrameLayout
+        android:id="@+id/line"
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        app:layout_constraintLeft_toRightOf="@id/notes"/>
+    <FrameLayout
+        android:id="@+id/note"
+        android:name="com.example.notes.NoteFragment"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintLeft_toRightOf="@id/line"
+        app:layout_constraintRight_toRightOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
