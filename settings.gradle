@@ -9,3 +9,4 @@ dependencyResolutionManagement {
 rootProject.name = "Homework1"
 include ':app'
 include ':app:calculator'
+include ':app:notes'
