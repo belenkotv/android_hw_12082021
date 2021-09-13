@@ -9,9 +9,13 @@ public class Note {
     Date date;
 
     public Note(String name, String description) {
+        this(name, description, new Date());
+    }
+
+    public Note(String name, String description, Date date) {
         this.name = name;
         this.description = description;
-        this.date = new Date();
+        this.date = date;
     }
 
     public String getName() {

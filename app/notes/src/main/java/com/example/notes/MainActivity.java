@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void showNoteFragment(int position) {
         Note note = ITEMS.get(position);
-        NoteFragment fragment = NoteFragment.newInstance(note.getName(), note.getDescription(), note.getDate());
+        NoteFragment fragment = NoteFragment.newInstance(note);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.note, fragment);
         //ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);

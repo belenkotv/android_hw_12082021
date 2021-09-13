@@ -19,7 +19,7 @@ public class NoteActivity extends AppCompatActivity {
         public Fragment instantiate(ClassLoader classLoader, String className) {
             if (className.equals("com.example.notes.NoteFragment")) {
                 Note note = MainActivity.ITEMS.get(position);
-                return NoteFragment.newInstance(note.getName(), note.getDescription(), note.getDate());
+                return NoteFragment.newInstance(note);
             } else {
                 return super.instantiate(classLoader, className);
             }
