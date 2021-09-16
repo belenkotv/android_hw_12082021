@@ -14,4 +14,13 @@
         <!-- Customize your theme here. -->
         <item name="android:textSize">@dimen/font_size</item>
     </style>
+    <style name="Theme.Homework1.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="Theme.Homework1.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.Homework1.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="NavigationDrawerStyle">
+        <item name="android:textSize">@dimen/font_size</item>
+    </style>
 </resources>
