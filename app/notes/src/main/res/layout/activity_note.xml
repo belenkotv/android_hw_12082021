@@ -6,9 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".NoteActivity">
 
-    <fragment
+    <FrameLayout
         android:id="@+id/note"
-        android:name="com.example.notes.NoteFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

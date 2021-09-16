@@ -10,4 +10,9 @@
     <string name="create">Создать</string>
     <string name="search">Поиск</string>
     <string name="sort">Сортировать</string>
+    <string name="save">Сохранить</string>
+    <string name="list">Список</string>
+    <string name="edit">Изменить</string>
+    <string name="delete">Удалить</string>
+    <string name="delete_note">Вы уверены, что хотите удалить заметку?</string>
 </resources>
