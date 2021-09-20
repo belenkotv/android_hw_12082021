@@ -1,10 +1,14 @@
 package com.example.notes;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,9 +21,16 @@ import java.util.List;
 public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerViewAdapter.ViewHolder> {
 
     private final List<Note> mValues;
+    private NoteClickListener mClickListener;
 
-    public NoteRecyclerViewAdapter(List<Note> items) {
+    public interface NoteClickListener {
+        void onClick(int position);
+        void onLongClick(int position, View view);
+    }
+
+    public NoteRecyclerViewAdapter(List<Note> items, NoteClickListener clickListener) {
         mValues = items;
+        mClickListener = clickListener;
     }
 
     @Override
@@ -39,7 +50,8 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
         return mValues.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener, View.OnLongClickListener {
         public final TextView mIdView;
         public final TextView mContentView;
         public Note mItem;
@@ -49,6 +61,7 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
             mIdView = binding.itemNumber;
             mContentView = binding.content;
             binding.getRoot().setOnClickListener(this);
+            binding.getRoot().setOnLongClickListener(this);
         }
 
         @Override
@@ -58,14 +71,14 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
 
         @Override
         public void onClick(View view) {
-            int orientation = view.getContext().getResources().getConfiguration().orientation;
-            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                MainActivity.mainActivity.showNoteFragment(this.getAbsoluteAdapterPosition());
-            } else {
-                Intent intent = new Intent(view.getContext(), NoteActivity.class);
-                intent.putExtra(NoteActivity.INDEX, this.getAbsoluteAdapterPosition());
-                view.getContext().startActivity(intent);
-            }
-         }
+            mClickListener.onClick(this.getAbsoluteAdapterPosition());
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            mClickListener.onLongClick(this.getAbsoluteAdapterPosition(), view);
+            return true;
+        }
     }
+
 }

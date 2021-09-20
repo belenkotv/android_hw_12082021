@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.text.ParseException;
@@ -18,13 +19,15 @@ import java.util.Date;
  * Use the {@link NoteFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NoteFragment extends Fragment {
+public class NoteFragment extends Fragment implements View.OnClickListener {
 
-    private static final String ARG_NAME = "name";
-    private static final String ARG_DESCRIPTION = "description";
-    private static final String ARG_DATE = "date";
+    public static final String RESULT = "result";
+    public static final String SAVED = "saved";
 
     private Note note;
+    private boolean forEdit = false;
+    private ViewGroup form;
+    private boolean added = false;
     private static SimpleDateFormat format = new SimpleDateFormat("dd/MM/yy hh:mm:ss");
 
     public NoteFragment() {
@@ -38,52 +41,76 @@ public class NoteFragment extends Fragment {
      * @param note Note class.
      * @return A new instance of fragment NoteFragment.
      */
-    public static NoteFragment newInstance(Note note) {
+    public static NoteFragment newInstance(Note note, boolean forEdit) {
         NoteFragment fragment = new NoteFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_NAME, note.name);
-        args.putString(ARG_DESCRIPTION, note.description);
-        args.putString(ARG_DATE, format.format(note.date));
-        fragment.setArguments(args);
+        fragment.note = note;
+        fragment.forEdit = forEdit;
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            Date date;
-            try {
-                date = format.parse(getArguments().getString(ARG_DATE));
-            } catch (ParseException e) {
-                e.printStackTrace();
-                date = new Date();
-            }
-            note = new Note(
-                getArguments().getString(ARG_NAME),
-                getArguments().getString(ARG_DESCRIPTION),
-                date);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        ViewGroup ret = (ViewGroup)
-            inflater.inflate(R.layout.fragment_note, container, false);
+        form = (ViewGroup)inflater.inflate(R.layout.fragment_note, container, false);
+        if (forEdit) {
+            form.findViewById(R.id.name_text).setVisibility(View.INVISIBLE);
+            form.findViewById(R.id.description_text).setVisibility(View.INVISIBLE);
+            form.findViewById(R.id.save).setOnClickListener(this);
+        } else {
+            form.findViewById(R.id.name_edit).setVisibility(View.INVISIBLE);
+            form.findViewById(R.id.description_edit).setVisibility(View.INVISIBLE);
+            form.findViewById(R.id.save).setVisibility(View.INVISIBLE);
+        }
         if (note == null) {
-            return ret;
+            note = new Note("", "");
+            added = true;
         }
         if (note.name != null) {
-            ((TextView) ret.findViewById(R.id.name_text)).setText(note.name);
+            if (forEdit) {
+                ((EditText)form.findViewById(R.id.name_edit)).setText(note.name);
+            } else {
+                ((TextView)form.findViewById(R.id.name_text)).setText(note.name);
+            }
         }
         if (note.description != null) {
-            ((TextView) ret.findViewById(R.id.description_text)).setText(note.description);
+            if (forEdit) {
+                ((EditText)form.findViewById(R.id.description_edit)).setText(note.description);
+            } else {
+                ((TextView)form.findViewById(R.id.description_text)).setText(note.description);
+            }
         }
         if (note.date != null) {
-            ((TextView) ret.findViewById(R.id.date_text)).setText(format.format(note.date));
+            ((TextView)form.findViewById(R.id.date_text)).setText(format.format(note.date));
         }
-        return ret;
+        return form;
     }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case  R.id.save:
+                if (note != null) {
+                    note.name = String.valueOf(
+                        ((EditText)form.findViewById(R.id.name_edit)).getText()
+                    );
+                    note.description = String.valueOf(
+                        ((EditText)form.findViewById(R.id.description_edit)).getText()
+                    );
+                }
+                if (added) {
+                    MainActivity.ITEMS.add(note);
+                }
+                Bundle result = new Bundle();
+                result.putBoolean(SAVED, true);
+                getParentFragmentManager().setFragmentResult(RESULT, result);
+                break;
+        }
+    }
+
 }
