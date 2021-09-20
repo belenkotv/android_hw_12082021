@@ -17,29 +17,53 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final List<Note> ITEMS = new ArrayList<Note>();
+    public static final String TAG = "Notes";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        ITEMS.clear();
-        ITEMS.add(new Note("Заметка №1", "ничего особенного"));
-        ITEMS.add(new Note("Заметка №2", "тоже ничего особенного"));
-        ITEMS.add(new Note("Заметка №3", "вообще ничего особенного"));
+        List<NotesList.Item> notes = NotesList.getInstance();
+        notes.clear();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection(NotesList.DB)
+            .get()
+            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            NotesList.Item item = new NotesList.Item(
+                                document.getId(),
+                                document.toObject(Note.class)
+                            );
+                            notes.add(item);
+                        }
+                        navigateFragment(R.id.list);
+                    } else {
+                        Log.w(TAG, "Error getting documents.", task.getException());
+                    }
+                }
+            });
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViews();
-        navigateFragment(R.id.list);
         getSupportFragmentManager().setFragmentResultListener(NoteShortFragment.RESULT, this,
             new FragmentResultListener() {
                 @Override
@@ -72,13 +96,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showNoteFragment(int position) {
-        Note note = ITEMS.get(position);
-        NoteFragment fragment = NoteFragment.newInstance(note, false);
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.note, fragment);
-        //ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        ft.addToBackStack(null);
-        ft.commit();
+        Fragment oldFragment = getSupportFragmentManager().findFragmentById(R.id.note);
+        if (position >= NotesList.getInstance().size()) {
+            if (oldFragment != null) {
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.remove(oldFragment);
+                ft.commit();
+            }
+        } else {
+            NoteFragment fragment = NoteFragment.newInstance(position, false);
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            if (oldFragment == null) {
+                ft.add(R.id.note, fragment);
+            } else {
+                ft.replace(R.id.note, fragment);
+            }
+            //ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            ft.addToBackStack(null);
+            ft.commit();
+        }
     }
 
     private void initViews() {

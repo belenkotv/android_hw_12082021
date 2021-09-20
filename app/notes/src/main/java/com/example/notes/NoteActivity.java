@@ -18,12 +18,11 @@ public class NoteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note);
         Bundle bundle = getIntent().getExtras();
-        Note note = null;
+        int position = -1;
         Boolean forEdit = false;
         if (bundle != null) {
-            Integer position = bundle.getInt(INDEX, -1);
-            if ((position >= 0) && (position < MainActivity.ITEMS.size())) {
-                note = MainActivity.ITEMS.get(position);
+            position = bundle.getInt(INDEX, -1);
+            if ((position >= 0) && (position < NotesList.getInstance().size())) {
                 forEdit = bundle.getBoolean(EDIT, false);
             } else {
                 forEdit = true;
@@ -31,7 +30,7 @@ public class NoteActivity extends AppCompatActivity {
         }
         getSupportFragmentManager()
             .beginTransaction()
-            .replace(R.id.note, NoteFragment.newInstance(note, forEdit))
+            .replace(R.id.note, NoteFragment.newInstance(position, forEdit))
             .commit();
         getSupportFragmentManager().setFragmentResultListener(NoteFragment.RESULT, this,
             new FragmentResultListener() {

@@ -19,10 +19,17 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -65,25 +72,14 @@ public class NoteShortFragment extends Fragment implements NoteRecyclerViewAdapt
             Context context = view.getContext();
             list = (RecyclerView) view;
             list.setLayoutManager(new LinearLayoutManager(context));
-            list.setAdapter(new NoteRecyclerViewAdapter(MainActivity.ITEMS, this));
+            list.setAdapter(new NoteRecyclerViewAdapter(this));
         }
         return view;
     }
 
     @Override
     public void onClick(int position) {
-        if (position < 0) {
-            launchNoteActivity(position, true);
-            return;
-        }
-        int orientation = getContext().getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            Bundle bundle = new Bundle();
-            bundle.putInt(POSITION, position);
-            getParentFragmentManager().setFragmentResult(RESULT, bundle);
-        } else {
-            launchNoteActivity(position, false);
-        }
+        showNote(position, true);
     }
 
     @Override
@@ -105,8 +101,25 @@ public class NoteShortFragment extends Fragment implements NoteRecyclerViewAdapt
                             .setMessage(R.string.delete_note)
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    MainActivity.ITEMS.remove(position);
-                                    list.getAdapter().notifyDataSetChanged();
+                                    List<NotesList.Item> notes = NotesList.getInstance();
+                                    FirebaseFirestore.getInstance()
+                                        .collection(NotesList.DB)
+                                        .document(notes.get(position).id)
+                                        .delete()
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                notes.remove(position);
+                                                list.getAdapter().notifyDataSetChanged();
+                                                showNote(position, false);
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(Exception e) {
+                                                Log.w(MainActivity.TAG, "Error deleting document", e);
+                                            }
+                                        });
                                 }
                             })
                             .setNegativeButton(android.R.string.no, null)
@@ -124,6 +137,21 @@ public class NoteShortFragment extends Fragment implements NoteRecyclerViewAdapt
         intent.putExtra(NoteActivity.INDEX, position);
         intent.putExtra(NoteActivity.EDIT, forEdit);
         launcher.launch(intent);
+    }
+
+    private void showNote(int position, boolean onClick) {
+        if (position < 0) {
+            launchNoteActivity(position, true);
+            return;
+        }
+        int orientation = getContext().getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Bundle bundle = new Bundle();
+            bundle.putInt(POSITION, position);
+            getParentFragmentManager().setFragmentResult(RESULT, bundle);
+        } else if (onClick && (position < NotesList.getInstance().size())) {
+            launchNoteActivity(position, false);
+        }
     }
 
 }

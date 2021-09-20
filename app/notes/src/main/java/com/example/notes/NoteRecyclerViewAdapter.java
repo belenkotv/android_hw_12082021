@@ -20,17 +20,15 @@ import java.util.List;
 
 public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Note> mValues;
-    private NoteClickListener mClickListener;
+    private NoteClickListener clickListener;
 
     public interface NoteClickListener {
         void onClick(int position);
         void onLongClick(int position, View view);
     }
 
-    public NoteRecyclerViewAdapter(List<Note> items, NoteClickListener clickListener) {
-        mValues = items;
-        mClickListener = clickListener;
+    public NoteRecyclerViewAdapter(NoteClickListener clickListener) {
+        this.clickListener = clickListener;
     }
 
     @Override
@@ -40,14 +38,15 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
+        List<NotesList.Item> list = NotesList.getInstance();
+        holder.mItem = list.get(position).data;
         holder.mIdView.setText(String.valueOf(position + 1));
-        holder.mContentView.setText(mValues.get(position).getName());
+        holder.mContentView.setText(list.get(position).data.getName());
     }
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return NotesList.getInstance().size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder
@@ -71,12 +70,12 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
 
         @Override
         public void onClick(View view) {
-            mClickListener.onClick(this.getAbsoluteAdapterPosition());
+            clickListener.onClick(this.getAbsoluteAdapterPosition());
         }
 
         @Override
         public boolean onLongClick(View view) {
-            mClickListener.onLongClick(this.getAbsoluteAdapterPosition(), view);
+            clickListener.onLongClick(this.getAbsoluteAdapterPosition(), view);
             return true;
         }
     }

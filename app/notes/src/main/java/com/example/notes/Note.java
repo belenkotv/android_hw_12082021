@@ -4,9 +4,12 @@ import java.util.Date;
 
 public class Note {
 
-    String name;
-    String description;
-    Date date;
+    private String name;
+    private String description;
+    private Date date;
+
+    public Note() {
+    }
 
     public Note(String name, String description) {
         this(name, description, new Date());
@@ -28,6 +31,14 @@ public class Note {
 
     public Date getDate() {
         return date;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
 }
